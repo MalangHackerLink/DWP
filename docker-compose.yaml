@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  mysql:
+    image: mysql:5.7
+    environment: 
+      MYSQL_ROOT_PASSWORD: 1sampai8
+      MYSQL_DATABASE: Vtuber
+      MYSQL_USER: vtuber
+      MYSQL_PASSWORD: kano2525
+      
+    volumes:
+      - ./db/web.sql:/docker-entrypoint-initdb.d/web.sql
+
+    command: --explicit_defaults_for_timestamp
+    restart: on-failure
+
+  dvwa:
+    build: vulnerable-dvwa/
+    environment:
+      DB: mysql
+    ports:
+      - 8080:80
+      
+  auth:
+    image: mlan/openldap:1
+    restart: unless-stopped
+    volumes:
+      - ./web_for_pentest/seed:/var/lib/openldap/seed
+
+  web_pentest:
+    build: web_for_pentest
+    environment:
+      DB: mysql
+      LDAP: auth
+    ports:
+      - 80:80
