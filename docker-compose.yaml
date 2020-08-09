@@ -5,9 +5,6 @@ services:
     image: mysql:5.7
     environment: 
       MYSQL_ROOT_PASSWORD: 1sampai8
-      MYSQL_DATABASE: Vtuber
-      MYSQL_USER: vtuber
-      MYSQL_PASSWORD: kano2525
       
     volumes:
       - ./db/web.sql:/docker-entrypoint-initdb.d/web.sql
@@ -21,6 +18,13 @@ services:
       DB: mysql
     ports:
       - 8080:80
+
+  bwapp:
+    build: bWAPP
+    environment:
+      DB: mysql
+    ports:
+      - 9090:80
       
   auth:
     image: mlan/openldap:1
