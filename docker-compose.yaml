@@ -5,13 +5,18 @@ services:
     image: mysql:5.7
     environment: 
       MYSQL_ROOT_PASSWORD: 1sampai8
-      
     volumes:
-      - ./db/web.sql:/docker-entrypoint-initdb.d/web.sql
-
-    command: --explicit_defaults_for_timestamp
+      - ./db/fix.sql:/docker-entrypoint-initdb.d/fix.sql
     restart: on-failure
 
+  web_pentest:
+    build: web_for_pentest
+    environment:
+      DB: mysql
+      LDAP: auth
+    ports:
+      - 7070:80
+    
   dvwa:
     build: vulnerable-dvwa/
     environment:
@@ -31,11 +36,3 @@ services:
     restart: unless-stopped
     volumes:
       - ./web_for_pentest/seed:/var/lib/openldap/seed
-
-  web_pentest:
-    build: web_for_pentest
-    environment:
-      DB: mysql
-      LDAP: auth
-    ports:
-      - 80:80
