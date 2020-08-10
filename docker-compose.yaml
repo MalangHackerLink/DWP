@@ -15,24 +15,43 @@ services:
       DB: mysql
       LDAP: auth
     ports:
-      - 7070:80
+      - 1000:80
     
   dvwa:
     build: vulnerable-dvwa/
     environment:
       DB: mysql
     ports:
-      - 8080:80
+      - 2000:80
 
   bwapp:
     build: bWAPP
     environment:
       DB: mysql
     ports:
-      - 9090:80
+      - 3000:80
       
   auth:
     image: mlan/openldap:1
     restart: unless-stopped
     volumes:
       - ./web_for_pentest/seed:/var/lib/openldap/seed
+
+  webgoat:
+    image: webgoat/webgoat-8.0
+    environment:
+      - WEBWOLF_HOST=webwolf
+      - WEBWOLF_PORT=9090
+      - TZ=Europe/Amsterdam
+    ports:
+      - "4000:8080"
+    volumes:
+      - ./webgoat:/home/webgoat/.webgoat
+    working_dir: /home/webgoat
+  webwolf:
+    image: webgoat/webwolf
+    ports:
+      - "5000:9090"
+    command: --spring.datasource.url=jdbc:hsqldb:hsql://webgoat:9001/webgoat --server.address=0.0.0.0
+    depends_on:
+            - webgoat
